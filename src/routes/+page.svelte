@@ -5,16 +5,21 @@
 
 	import SideBar from './sideBar.svelte';
 	import { figuresData, stateStore, isPaused, showDots, showFigures } from '$lib/state';
+	import { SceneBuilder } from './webgl/scene';
+	import { Line } from './webgl/line';
 
 	let fixedCanvas: HTMLCanvasElement;
 	let shapeCanvas: HTMLCanvasElement;
 	let frameCanvas: HTMLCanvasElement;
+	let sceneCanvas: HTMLCanvasElement;
 
 	let figures: Figure[] = $figuresData.map((data) => FiguresFactory.createFigure(data));
 	let pausedValue = $isPaused;
 	let showDotsValue = $showDots;
 	let showFiguresValue = $showFigures;
 	let timeValue = $stateStore.time;
+
+	let scene: SceneBuilder;
 
 	function reset() {
 		const shapeCtx = shapeCanvas.getContext('2d');
@@ -90,17 +95,19 @@
 	}
 
 	function initial_draw() {
-		const ctx = fixedCanvas.getContext('2d');
-		if (!ctx) throw new Error('No context');
-		ctx.reset();
-		ctx.beginPath();
-		ctx.moveTo(0, ctx.canvas.height / 2);
-		ctx.lineTo(ctx.canvas.width, ctx.canvas.height / 2);
-		ctx.stroke();
-		ctx.moveTo(ctx.canvas.width / 2, 0);
-		ctx.lineTo(ctx.canvas.width / 2, ctx.canvas.height);
-		ctx.stroke();
-		ctx.closePath();
+		if (!scene) return;
+		const axis_x = new Line(2, 0xffff0000);
+		const axis_y = new Line(2, 0xffffff00);
+		const axis_z = new Line(2, 0xff00ffff);
+		axis_x.addVertex(-100, 0, 0);
+		axis_x.addVertex(100, 0, 0);
+		axis_y.addVertex(0, -100, 0);
+		axis_y.addVertex(0, 100, 0);
+		axis_z.addVertex(0, 0, -100);
+		axis_z.addVertex(0, 0, 100);
+		scene.scene.add(axis_x.createLine());
+		scene.scene.add(axis_y.createLine());
+		scene.scene.add(axis_z.createLine());
 	}
 
 	function resize() {
@@ -115,6 +122,8 @@
 	}
 
 	onMount(() => {
+		scene = new SceneBuilder();
+		scene.createScene(sceneCanvas);
 		reset();
 		const interval = setInterval(() => {
 			step();
@@ -137,13 +146,11 @@
 		</PaperContent>
 	</Paper>
 
-	<main class="main-content">
+	<main>
 		<canvas bind:this={fixedCanvas} />
 		<canvas bind:this={shapeCanvas} />
+		<canvas bind:this={sceneCanvas} />
 		<canvas bind:this={frameCanvas} />
-		<!-- <canvas bind:this={fixedCanvas}   />
-        <canvas bind:this={shapeCanvas} />
-        <canvas bind:this={frameCanvas} /> -->
 	</main>
 </div>
 
