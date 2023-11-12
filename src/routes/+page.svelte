@@ -1,32 +1,20 @@
 <script lang="ts">
-	import FormField from '@smui/form-field';
 	import Paper, { Title, Subtitle, Content as PaperContent } from '@smui/paper';
-	import Button, { Icon as ButtonIcon, Label as ButtonLabel } from '@smui/button';
-    import Checkbox from '@smui/checkbox';
-	import Card, { Content as CardContent } from '@smui/card';
 	import { Point, type CircleDTO, type dto, type Figure, FiguresFactory, type NgonDTO, FigureType } from '$lib';
 	import { onMount } from 'svelte';
 
-    import CircleComponent from './figures-settings/circleComponent.svelte';
-    import NgonComponent from './figures-settings/ngonComponent.svelte';
-    import { ColorsCycler } from '$lib';
+	import SideBar from './sideBar.svelte';
+	import { stateStore } from '$lib/state';
 
-    const colorsCycler = new ColorsCycler(['rgba(255,0,0,1)', 'rgba(0,255,0,0)', 'rgba(0,0,255,1)']);
 	let fixedCanvas: HTMLCanvasElement;
 	let shapeCanvas: HTMLCanvasElement;
 	let frameCanvas: HTMLCanvasElement;
-	let deltaT = 0;
-	let figuresData: dto[] = [];
+
     let figures: Figure[] = [];
-    let lastPoint: Point = new Point(0,0);
 
-    let showFigures = true;
-    let showDots = true;
-    let speed = 0.1;
-    let paused  = false;
-
-
-
+    stateStore.subscribe((state) => {
+        figures = state.figures;
+    });
 	function reset() {
         const shapeCtx = shapeCanvas.getContext('2d');
         if (!shapeCtx) throw new Error('No context');
@@ -87,33 +75,6 @@
         lastPoint = location;
 	}
 
-	function add_circle() {
-		figuresData.push(<CircleDTO>{
-			figureType: FigureType.Circle,
-            radius: 100,
-			pointSpeed: 0
-		});
-		figuresData = [...figuresData];
-		reset();
-	}
-
-    function add_ngon() {
-        figuresData.push(<NgonDTO>{
-            figureType: FigureType.Square,
-            numSides: 2,
-            radius: 100,
-            pointSpeed: 0,
-            rotationSpeed: 0
-        });
-        figuresData = [...figuresData];
-        reset();
-    }
-
-    function remove_figure(i:number) {
-        figuresData.splice(i, 1);
-        figuresData = [...figuresData];
-        reset();
-    }
 
 	function initial_draw() {
 		const ctx = fixedCanvas.getContext('2d');
@@ -163,72 +124,7 @@
 <div class="drawer-container app-content">
     <Paper>
         <PaperContent>
-            <aside>
-                <Card>
-                    <CardContent>
-                        <h3>Settings</h3>
-                        <FormField style="display: flex;">
-                            <Checkbox bind:checked={showFigures} />
-                            <span slot="label">
-                                Show circles
-                            </span>
-                        </FormField>
-                        <FormField style="display: flex;">
-                            <Checkbox bind:checked={showDots} />
-                            <span slot="label">
-                                Show circle dot
-                            </span>
-                        </FormField>
-                        <FormField style="display: flex;">
-                            <Checkbox bind:checked={paused} />
-                            <span slot="label">
-                                Paused {paused}
-                            </span>
-                        </FormField>
-                        <FormField style="display: flex">
-                            <input
-                                type="range"
-                                style="flex-grow: 1;"
-                                bind:value={speed}
-                                min={0}
-                                max={2}
-                                step="0.1"/>
-                            <span slot="label" style="padding-right: 12px; width: max-content; display: block;">
-                                Speed {speed}
-                            </span>
-                        </FormField>
-                        <FormField align="end" style="display: flex;">
-                            <Button on:click={() => reset()}>
-                                <ButtonIcon class="material-icons">refresh</ButtonIcon>
-                                <ButtonLabel>Reset</ButtonLabel>
-                            </Button>
-                        </FormField>
-                    </CardContent>
-                </Card>
-                {#each figuresData as figure,i}
-                    <Card>
-                        {#if (figure.figureType == FigureType.Circle) }
-                            <CircleComponent i={i} figure={figure} remove_figure={remove_figure} reset={reset}/>
-                        {/if}
-                        {#if (figure.figureType == FigureType.Square) }
-                            <NgonComponent i={i} figure={figure} remove_figure={remove_figure} reset={reset}/>
-                        {/if}
-                    </Card>
-                {/each}
-                <Card>
-                    <CardContent>
-                        <Button on:click={() => add_circle()}>
-                            <ButtonIcon class="material-icons">add_circle</ButtonIcon>
-                            <ButtonLabel>Add Circle</ButtonLabel>
-                        </Button>
-                        <Button on:click={() => add_ngon()}>
-                            <ButtonIcon class="material-icons">add_circle</ButtonIcon>
-                            <ButtonLabel>Add NGon</ButtonLabel>
-                        </Button>
-                    </CardContent>
-                </Card>
-            </aside>
-        
+            <SideBar />
         </PaperContent>
     </Paper>
 
