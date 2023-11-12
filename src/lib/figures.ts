@@ -1,13 +1,8 @@
-export class Point extends Object{
-    public x:number;
-    public y:number;
-    constructor(x:number,y:number){
-        super();
-        this.x = x;
-        this.y = y;
+export class Point{
+    public constructor(public x:number,public y:number){
     }
 
-    override toString():string{
+    public toString():string{
         return `(${this.x},${this.y})`;
     }   
 
@@ -24,7 +19,7 @@ export class Point extends Object{
         return new Point(this.x*other.x,this.y*other.y);
     }
 
-    public lenght():number{
+    public length():number{
         return Math.sqrt(this.x*this.x+this.y*this.y);
     }
 
@@ -35,8 +30,9 @@ export class Point extends Object{
     public static fromPolar(angle:number,radius:number):Point{
         return new Point(radius*Math.cos(angle),radius*Math.sin(angle));
     }
-    
 }
+
+export const ZeroPoint = new Point(0,0);
 
 
 export enum FigureType{
@@ -82,7 +78,7 @@ export class Circle implements Figure{
         return result;
     }
 
-    public drawAt(canvas:CanvasRenderingContext2D,point:Point,deltaT:number):void{
+    public drawAt(canvas:CanvasRenderingContext2D,point:Point):void{
         canvas.beginPath();
         canvas.arc(point.x,point.y,this.radius,0,2*Math.PI);
         canvas.stroke();
@@ -130,9 +126,6 @@ export class NGon implements Figure {
     
         // Determine the position on that side
         const positionOnSide = distanceTraveled % this.edgeLength;
-    
-        // Initialize point coordinates
-        let x = 0, y = 0;
     
         const corners = this.cornersPosition(deltaT);
         const p1 = corners[sideIndex];
