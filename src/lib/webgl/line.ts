@@ -4,6 +4,7 @@ export class Line {
 	private geometry: THREE.BufferGeometry;
 	private numVertices: number = 0;
 	private material: THREE.LineBasicMaterial;
+	private lineObject: THREE.Object3D | null = null;
 	constructor(maxVertices: number, color: number) {
 		this.material = new THREE.LineBasicMaterial({ color });
 
@@ -22,7 +23,11 @@ export class Line {
 		this.geometry.setDrawRange(0, this.numVertices);
 	}
 
-	public createLine() {
-		return new THREE.Line(this.geometry, this.material);
+	public get line():THREE.Object3D {
+		if (!this.lineObject) {
+			this.lineObject = new THREE.Line(this.geometry, this.material);
+			this.lineObject.frustumCulled = true;
+		}
+		return this.lineObject;
 	}
 }

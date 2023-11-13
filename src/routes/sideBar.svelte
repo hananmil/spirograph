@@ -1,46 +1,54 @@
 <script lang="ts">
 	import FormField from '@smui/form-field';
-	import Paper, { Title, Subtitle, Content as PaperContent } from '@smui/paper';
 	import Button, { Icon as ButtonIcon, Label as ButtonLabel } from '@smui/button';
 	import Checkbox from '@smui/checkbox';
 	import Card, { Content as CardContent } from '@smui/card';
-	import {
-		Point,
-		type CircleDTO,
-		type dto,
-		type Figure,
-		FiguresFactory,
-		type NgonDTO,
-		FigureType
-	} from '$lib';
-	import { onMount } from 'svelte';
+	import { type CircleDTO, type NgonDTO, FigureType, ReadableDto, type DTO } from '$lib';
 
 	import CircleComponent from './figures-settings/circleComponent.svelte';
 	import NgonComponent from './figures-settings/ngonComponent.svelte';
-	import { figuresData, isPaused, showDots, showFigures, stateStore } from '$lib/state';
+	import { figuresData, isPaused, showDots, showFigures } from '$lib/state';
+
+	import GeneralSettingsComponent from './figures-settings/generalSettingsComponent.svelte';
+
+	export let reset: () => void;
 
 	function add_circle() {
 		figuresData.update((fd) => {
-			fd.push(<CircleDTO>{
+			
+			const newCircle:CircleDTO = <CircleDTO>{
 				figureType: FigureType.Circle,
-				radius: 100,
-				pointSpeed: 0
-			});
+				radius: 1.3,
+				pointSpeed: 0,
+				rotationSpeed: {
+					x: 0,
+					y: 0,
+					z: 0
+				}
+			};
+			const readableCircle:ReadableDto<DTO> = new ReadableDto(newCircle);
+			fd.push(readableCircle);
 			return [...fd];
 		});
+		reset();
 	}
 
 	function add_ngon() {
 		figuresData.update((fd) => {
 			fd.push(<NgonDTO>{
 				figureType: FigureType.Square,
-				numSides: 2,
-				radius: 100,
+				numSides: 4,
+				radius: 1.3,
 				pointSpeed: 0,
-				rotationSpeed: 0
+				rotationSpeed: {
+					x: 0,
+					y: 0,
+					z: 0
+				}
 			});
 			return [...fd];
 		});
+		reset();
 	}
 
 	function remove_figure(i: number) {
@@ -48,44 +56,19 @@
 			fd.splice(i, 1);
 			return [...fd];
 		});
+		reset();
 	}
 </script>
 
 <aside>
-	<Card>
-		<CardContent>
-			<h3>Settings</h3>
-			<FormField style="display: flex;">
-				<Checkbox bind:checked={$showFigures} />
-				<span slot="label"> Show figures </span>
-			</FormField>
-			<FormField style="display: flex;">
-				<Checkbox bind:checked={$showDots} />
-				<span slot="label"> Show figure dots </span>
-			</FormField>
-			<FormField style="display: flex;">
-				<Checkbox bind:checked={$isPaused} />
-				<span slot="label">
-					Pause {$isPaused ? '▶' : '⏸'}
-				</span>
-			</FormField>
-			<FormField align="end" style="display: flex;">
-				<Button on:click={() => stateStore.resetState()}>
-					<ButtonIcon class="material-icons">refresh</ButtonIcon>
-					<ButtonLabel>Reset time</ButtonLabel>
-				</Button>
-			</FormField>
-		</CardContent>
-	</Card>
+	<GeneralSettingsComponent {reset}  />
 	{#each $figuresData as figure, i}
-		<Card>
-			{#if figure.figureType == FigureType.Circle}
-				<CircleComponent {i} {figure} {remove_figure} reset={stateStore.resetState} />
-			{/if}
-			{#if figure.figureType == FigureType.Square}
-				<NgonComponent {i} {figure} {remove_figure} reset={stateStore.resetState} />
-			{/if}
-		</Card>
+		{#if figure.figureType == FigureType.Circle}
+			<CircleComponent {i} {figure} {remove_figure} {reset} />
+		{/if}
+		{#if figure.figureType == FigureType.Square}
+			<NgonComponent {i} {figure} {remove_figure} {reset} />
+		{/if}
 	{/each}
 	<Card>
 		<CardContent>
@@ -103,7 +86,7 @@
 
 <style lang="less">
 	aside {
-		width: 30em;
+		width: 35em;
 		padding: 1em;
 	}
 </style>

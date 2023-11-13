@@ -1,14 +1,15 @@
 import { writable, type Readable, type Writable } from 'svelte/store';
-import { Point,ZeroPoint, type dto } from "$lib";
+import type { DTO, ReadableDto } from "$lib";
+import * as THREE from "three";
+import { expoOut } from 'svelte/easing';
 
 interface State {
     time:number;
-    lastPoint: Point;
+    lastPoint: THREE.Vector3;
 }
-const center = ZeroPoint;
 const defaultState:State = {
     time: 0,
-    lastPoint:center
+    lastPoint: new THREE.Vector3(0,0,0)
 }
 
 
@@ -19,7 +20,7 @@ function createStateStore(){
     return {
         state: readableState,
         resetState: () => update(state => {
-            state.lastPoint = new Point(0,0);
+            state.lastPoint = new THREE.Vector3(0,0,0);
             state.time = 0;
             return state;
         }),
@@ -27,7 +28,7 @@ function createStateStore(){
             state.time = timeFunc(state.time);
             return state;
         }),
-        updateLastPoint: (updateFunc:(point:Point)=>Point) => update(state => {
+        updateLastPoint: (updateFunc:(point:THREE.Vector3)=>THREE.Vector3) => update(state => {
             state.lastPoint = updateFunc(state.lastPoint);
             return state;
         }),
@@ -35,10 +36,11 @@ function createStateStore(){
     }
 }
 
+export const rotateCamera:Writable<boolean> = writable(true);
+export const cameraFocalDistance:Writable<number> = writable(50);
 export const showFigures:Writable<boolean> = writable(true);
 export const showDots:Writable<boolean> = writable(true);
 export const isPaused:Writable<boolean> = writable(false);
 export const stateStore = createStateStore();
-export const figuresData: Writable<dto[]> = writable([]);
-
-
+export const figuresData: Writable<ReadableDto<DTO>[]> = writable([]);
+export const stepsPerSecond: Writable<number> = writable(1);

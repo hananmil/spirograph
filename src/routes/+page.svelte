@@ -1,97 +1,68 @@
 <script lang="ts">
 	import Paper, { Title, Subtitle, Content as PaperContent } from '@smui/paper';
-	import { Point, type Figure, FiguresFactory } from '$lib';
+	import { type Figure, FiguresFactory } from '$lib';
 	import { onMount } from 'svelte';
 
 	import SideBar from './sideBar.svelte';
-	import { figuresData, stateStore, isPaused, showDots, showFigures } from '$lib/state';
-	import { SceneBuilder } from './webgl/scene';
-	import { Line } from './webgl/line';
+	import { figuresData, stateStore, isPaused, stepsPerSecond } from '$lib/state';
+	import { SimScene } from '../lib/webgl/scene';
+	import { Line } from '../lib/webgl/line';
+	import * as THREE from 'three';
 
-	let fixedCanvas: HTMLCanvasElement;
-	let shapeCanvas: HTMLCanvasElement;
-	let frameCanvas: HTMLCanvasElement;
 	let sceneCanvas: HTMLCanvasElement;
 
-	let figures: Figure[] = $figuresData.map((data) => FiguresFactory.createFigure(data));
-	let pausedValue = $isPaused;
-	let showDotsValue = $showDots;
-	let showFiguresValue = $showFigures;
-	let timeValue = $stateStore.time;
+	let scene: SimScene;
+	let trace: Line;
+	let lineGeometry: THREE.Object3D;
 
-	let scene: SceneBuilder;
+	let figures: Figure[] = [];
+	figuresData.subscribe((fd) => {
+		console.log('figuresData updated');
+		for (let i = 0; i < figures.length; i++) {
+			scene.scene.remove(figures[i].object3d);
+		}
+		if (!scene) return;
+		figures = fd.map((data) => {
+			const fig = FiguresFactory.createFigure(data)
+			scene.scene.add(fig.object3d);
+			return fig;
+		});
+	});
 
 	function reset() {
-		const shapeCtx = shapeCanvas.getContext('2d');
-		if (!shapeCtx) throw new Error('No context');
-		shapeCanvas.getContext('2d')?.reset();
-		frameCanvas.getContext('2d')?.reset();
-		let lp = new Point(0, 0);
-		for (let i = 0; i < figures.length; i++) {
-			let point = figures[i].getPoint(0);
-			lp = lp.add(point);
+		// console.log('reset');
+		if (!scene) return;
+
+		if (lineGeometry){
+			scene.scene.remove(lineGeometry);
 		}
-		stateStore.resetState();
-		stateStore.updateLastPoint(() => lp);
+		trace = new Line(100000, 0xffff00ff);
+		lineGeometry = trace.line;
+		scene.scene.add(lineGeometry);
 		initial_draw();
 	}
 
-	function drawFrame(frameCtx: CanvasRenderingContext2D): Point {
-		frameCtx.reset();
-		frameCtx.font = '32px serif';
-		frameCtx.strokeText('Time ' + timeValue.toFixed(3), 40, 40);
-
-		let location: Point = new Point(frameCtx.canvas.width / 2, frameCtx.canvas.height / 2);
-
-		for (let i = 0; i < figures.length; i++) {
-			const figure = figures[i];
-			if (showFiguresValue) {
-				figure.drawAt(frameCtx, location, timeValue);
-			}
-			const point = figure.getPoint(timeValue);
-			location = location.add(point);
-			if (showDotsValue) {
-				frameCtx.beginPath();
-				frameCtx.arc(location.x, location.y, 5, 0, 2 * Math.PI);
-				frameCtx.fillStyle = 'red';
-				frameCtx.fill();
-				frameCtx.closePath();
-			}
-		}
-		return location;
-	}
-
-	function drawStroke(ctx: CanvasRenderingContext2D, location: Point) {
-		if (!ctx) throw new Error('No context');
-		ctx.beginPath();
-		stateStore.updateLastPoint((lastPoint: Point) => {
-			if (!ctx) throw new Error('Lost context');
-			ctx.moveTo(lastPoint.x, lastPoint.y);
-			ctx.lineTo(location.x, location.y);
-			return location;
-		});
-		ctx.stroke();
-		ctx.closePath();
-	}
 
 	function step() {
-		if (!shapeCanvas || !frameCanvas) return;
-
-		const frameCtx = frameCanvas.getContext('2d');
-		if (!frameCtx) throw new Error('No context');
-		const location: Point = drawFrame(frameCtx);
-		if (pausedValue) {
+		if ($isPaused) {
 			return;
 		}
-		const shapeCtx = shapeCanvas.getContext('2d');
-		if (!shapeCtx) throw new Error('No context');
+
+		let location = new THREE.Vector3(0, 0, 0);
+
+		for (let fig of figures) {
+			fig.moveTo(location, $stateStore.time);
+			const point = fig.getPoint();
+			location = location.add(point);
+		}
+
+		trace.addVertex(location.x, location.y, location.z);
+
 
 		stateStore.updateTime((time: number) => {
-			if (!shapeCtx) throw new Error('Lost context');
-			const timeFactor = 1;
+			const timeFactor = 0.01;
 			return time + timeFactor * (2 * Math.PI);
 		});
-		drawStroke(shapeCtx, location);
 	}
 
 	function initial_draw() {
@@ -105,52 +76,64 @@
 		axis_y.addVertex(0, 100, 0);
 		axis_z.addVertex(0, 0, -100);
 		axis_z.addVertex(0, 0, 100);
-		scene.scene.add(axis_x.createLine());
-		scene.scene.add(axis_y.createLine());
-		scene.scene.add(axis_z.createLine());
+		scene.scene.add(axis_x.line);
+		scene.scene.add(axis_y.line);
+		scene.scene.add(axis_z.line);
+
+		for (let i = -100; i <= 100; i++) {
+			let line = new Line(2, 0xff00ffff);
+			line.addVertex(-0.1, 0, i);
+			line.addVertex(0.1, 0, i);
+			scene.scene.add(line.line);
+			let line2 = new Line(2, 0xffff0000);
+			line2.addVertex(i, 0, -0.1);
+			line2.addVertex(i, 0, 0.1);
+			scene.scene.add(line2.line);
+			let line3 = new Line(2, 0xffffff00);
+			line3.addVertex(-0.1, i, 0);
+			line3.addVertex(0.1, i, 0);
+			scene.scene.add(line3.line);
+		}
 	}
 
 	function resize() {
-		fixedCanvas.width = window.innerWidth - 300;
-		fixedCanvas.height = window.innerHeight;
-		shapeCanvas.width = window.innerWidth - 300;
-		shapeCanvas.height = window.innerHeight;
-		frameCanvas.width = window.innerWidth - 300;
-		frameCanvas.height = window.innerHeight;
-		console.log(`resize ${window.innerWidth} ${window.innerHeight}`);
+		sceneCanvas.width = window.innerWidth - 300;
+		sceneCanvas.height = window.innerHeight;
+		scene.resize();
+		// console.log(`resize ${window.innerWidth} ${window.innerHeight}`);
 		reset();
 	}
 
+
+
 	onMount(() => {
-		scene = new SceneBuilder();
+		scene = new SimScene();
 		scene.createScene(sceneCanvas);
 		reset();
-		const interval = setInterval(() => {
-			step();
-			if (timeValue > 3000) {
+		let interval:number|undefined;
+		stepsPerSecond.subscribe((sps) => {
+			if (interval) {
 				clearInterval(interval);
 			}
-		}, 10);
+			interval = setInterval(() => {
+				step();
+				}, 1000/sps);
+		});
 		window.onresize = () => resize();
 		resize();
-		return () => {
-			// clearInterval(interval);
-		};
+		return () => { clearInterval(interval); };
 	});
 </script>
 
 <div class="drawer-container app-content">
 	<Paper>
 		<PaperContent>
-			<SideBar />
+			<SideBar {reset} />
 		</PaperContent>
 	</Paper>
 
 	<main>
-		<canvas bind:this={fixedCanvas} />
-		<canvas bind:this={shapeCanvas} />
 		<canvas bind:this={sceneCanvas} />
-		<canvas bind:this={frameCanvas} />
 	</main>
 </div>
 
