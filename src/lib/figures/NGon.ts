@@ -8,8 +8,8 @@ export class NGon implements Figure {
 	private rotationSpeed: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
 	private time: number = 0;
 	private edgeLength: number = 0;
-	private _object3d: THREE.Object3D = new THREE.Object3D();
-	private _pointMesh: THREE.Mesh = new THREE.Mesh();
+	private _object3d: THREE.Object3D;
+	private _pointMesh: THREE.Object3D;
 
 	public get object3d(): THREE.Object3D {
 		return this._object3d;
@@ -20,22 +20,27 @@ export class NGon implements Figure {
 
 		readableDTO.subscribe((dto: NgonDTO) => {
 			this._initFromDTO(dto);
-			this._object3d = this._updateGeometry();
+			const updatedGeometry = this._updateGeometry(this._object3d);
+			this._object3d = updatedGeometry.obj;
+			this._pointMesh = updatedGeometry.point;
 		});
 		this._initFromDTO(dto);
-		this._object3d = this._updateGeometry();
+		const updatedGeometry = this._updateGeometry();
+		this._object3d = updatedGeometry.obj;
+		this._pointMesh = updatedGeometry.point;
 	}
 
-	private _updateGeometry(): THREE.Object3D {
+	private _updateGeometry(parent:THREE.Object3D|null = null): {obj:THREE.Object3D,point:THREE.Object3D} {
 		const corners = this.cornersPosition();
-		// corners.push(corners[0]);
-
+		if (parent !== null) {
+			parent.remove(...parent.children);
+		}
+		const obj = parent ?? new THREE.Object3D();
 		const path = new THREE.CatmullRomCurve3(corners, true, 'catmullrom', 0.01);
 
 		const geometry = new THREE.TubeGeometry(path, 20 * this.numSides, 0.01, 12, true);
 		const material = new THREE.MeshBasicMaterial({ color: 4294967295, wireframe: true });
 
-		const obj = new THREE.Object3D();
 		obj.add(new THREE.Mesh(geometry, material));
 		const pointPosition = this.getLocalPoint();
 		const point = new THREE.Mesh(
@@ -44,8 +49,7 @@ export class NGon implements Figure {
 		);
 		point.position.set(pointPosition.x, pointPosition.y, pointPosition.z);
 		obj.add(point);
-		this._pointMesh = point;
-		return obj;
+		return {obj, point};
 	}
 
 	private _initFromDTO(dto: NgonDTO): void {
@@ -65,11 +69,7 @@ export class NGon implements Figure {
 	}
 
 	public getPoint(): THREE.Vector3 {
-		const point = this.getLocalPoint();
-		// const rotation = this.rotationSpeed.multiplyScalar(this.time);
-		const rotationMatrix = new THREE.Matrix4().makeRotationAxis(this.rotationSpeed, this.time);
-		const result = point.applyMatrix4(rotationMatrix);
-		return result;
+		return this._pointMesh.getWorldPosition(this._pointMesh.position.clone());
 	}
 
 	private getLocalPoint(): THREE.Vector3 {
@@ -106,9 +106,11 @@ export class NGon implements Figure {
 
 	public moveTo(point: THREE.Vector3, time: number): void {
 		this.time = time;
-		const pointPos = this.getLocalPoint().add(point);
-		this._pointMesh.position.set(pointPos.x, pointPos.y, pointPos.z);
+		const pointPos = this.getLocalPoint();
+		const rotationVector = new THREE.Vector3().copy(this.rotationSpeed).multiplyScalar(time);
+		this._object3d.rotation.set(rotationVector.x, rotationVector.y, rotationVector.z);
 		this._object3d.position.set(point.x, point.y, point.z);
+		this._pointMesh.position.set(pointPos.x, pointPos.y, pointPos.z);
 		// const rotation = this.rotationSpeed * time;
 		// this._object3d.rotation.set(0, 0, rotation);
 	}

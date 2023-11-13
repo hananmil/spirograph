@@ -54,6 +54,8 @@ export class Circle implements Figure {
 		this.time = time;
 		this._objectMesh.position.set(point.x, point.y, point.z);
 		const rotationVector = new THREE.Vector3().copy(this.rotationSpeed).multiplyScalar(time);
+		const pointLocal = this._getPointLocal();
+		this._pointMesh.position.set(pointLocal.x, pointLocal.y, pointLocal.z);
 		this._objectMesh.rotation.set(rotationVector.x, rotationVector.y, rotationVector.z);
 	}
 

@@ -25,14 +25,14 @@
 	<Content>
 		<h3>Circle {i + 1}</h3>
 		<SpeedControl
-			bind:speed={figure.radius}
+			bind:value={figure.radius}
 			min={0.1}
 			max={10}
 			step={0.1}
 			label={'Size'}
 			resetTo={1}
 		/>
-		<SpeedControl label="point speed" bind:speed={figure.pointSpeed} />
+		<SpeedControl label="point speed" bind:value={figure.pointSpeed} />
 		<Vector3DControl
 			label="rotation"
 			bind:x={figure.rotationSpeedX}

@@ -71,20 +71,20 @@ export class ReadableDto<DTO extends Record<string | symbol, unknown>, T extends
 	private _createDynamicSetter = (propertyName: string | symbol) => {
 		return {
 			set(this: ReadableDto<DTO, T>, newValue: DTO[T]) {
-				console.log(`Setting ${String(propertyName)} to ${newValue}`);
+				// console.log(`Setting ${String(propertyName)} to ${newValue}`);
 				// Custom logic for the setter
 				this._dto.update((dto: DTO) => {
 					Object.assign(dto, { [propertyName]: newValue });
 					return dto;
 				});
 				this._subscribeList.forEach((subscriber: Subscriber<DTO>) => {
-					console.log(`Calling subscriber for ${String(propertyName)} updated`);
+					// console.log(`Calling subscriber for ${String(propertyName)} updated`);
 					subscriber(this.dtoWrapper);
 				});
 			},
 			get(this: ReadableDto<DTO, T>): DTO[T] {
 				console.log(
-					`Getting ${String(propertyName)} to ${JSON.stringify(get(this._dto)[propertyName])}`
+					// `Getting ${String(propertyName)} to ${JSON.stringify(get(this._dto)[propertyName])}`
 				);
 				return get(this._dto)[propertyName] as DTO[T];
 			}

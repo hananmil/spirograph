@@ -15,7 +15,7 @@
 
 <SpeedControl
 	disabled={disableX}
-	bind:speed={x}
+	bind:value={x}
 	{min}
 	{max}
 	{step}
@@ -24,7 +24,7 @@
 />
 <SpeedControl
 	disabled={disableY}
-	bind:speed={y}
+	bind:value={y}
 	{min}
 	{max}
 	label={`${label} Y`}
@@ -33,7 +33,7 @@
 />
 <SpeedControl
 	disabled={disableZ}
-	bind:speed={z}
+	bind:value={z}
 	{min}
 	{max}
 	label={`${label} Z`}
