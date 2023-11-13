@@ -25,7 +25,6 @@
 		<h3>NGon</h3>
 		<FormField align="end" style="display: flex;">
 			<Slider
-				type="range"
 				style="flex-grow: 1;"
 				bind:value={figure.numSides}
 				min={2}
@@ -38,12 +37,11 @@
 		</FormField>
 		<FormField align="end" style="display: flex;">
 			<Slider
-				type="range"
 				style="flex-grow: 1;"
 				bind:value={figure.radius}
 				min={0.1}
 				max={10}
-				step="0.1"
+				step={0.1}
 				on:change={() => update()}
 			/>
 			<span slot="label" style="padding-right: 12px; width: max-content; display: block;">
@@ -51,7 +49,13 @@
 			</span>
 		</FormField>
 		<SpeedControl label="Point speed" bind:speed={figure.pointSpeed} onchange={update} />
-		<Vector3DControl label="Rotation speed" bind:vector={figure.rotationSpeed} onchange={update} />
+		<Vector3DControl
+			label="Rotation speed"
+			bind:x={figure.rotationSpeedX}
+			bind:y={figure.rotationSpeedY}
+			bind:z={figure.rotationSpeedZ}
+			onchange={update}
+		/>
 
 		<FormField align="end" style="display: flex;">
 			<Button on:click={() => remove_figure(i)}>

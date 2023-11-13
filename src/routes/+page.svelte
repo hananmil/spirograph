@@ -23,7 +23,7 @@
 		}
 		if (!scene) return;
 		figures = fd.map((data) => {
-			const fig = FiguresFactory.createFigure(data)
+			const fig = FiguresFactory.createFigure(data);
 			scene.scene.add(fig.object3d);
 			return fig;
 		});
@@ -33,7 +33,7 @@
 		// console.log('reset');
 		if (!scene) return;
 
-		if (lineGeometry){
+		if (lineGeometry) {
 			scene.scene.remove(lineGeometry);
 		}
 		trace = new Line(100000, 0xffff00ff);
@@ -41,7 +41,6 @@
 		scene.scene.add(lineGeometry);
 		initial_draw();
 	}
-
 
 	function step() {
 		if ($isPaused) {
@@ -57,7 +56,6 @@
 		}
 
 		trace.addVertex(location.x, location.y, location.z);
-
 
 		stateStore.updateTime((time: number) => {
 			const timeFactor = 0.01;
@@ -104,24 +102,24 @@
 		reset();
 	}
 
-
-
 	onMount(() => {
 		scene = new SimScene();
 		scene.createScene(sceneCanvas);
 		reset();
-		let interval:number|undefined;
+		let interval: number | undefined;
 		stepsPerSecond.subscribe((sps) => {
 			if (interval) {
 				clearInterval(interval);
 			}
 			interval = setInterval(() => {
 				step();
-				}, 1000/sps);
+			}, 1000 / sps);
 		});
 		window.onresize = () => resize();
 		resize();
-		return () => { clearInterval(interval); };
+		return () => {
+			clearInterval(interval);
+		};
 	});
 </script>
 

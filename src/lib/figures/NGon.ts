@@ -1,26 +1,32 @@
 import * as THREE from 'three';
-import { type Figure, type NgonDTO, FigureType } from '../figures';
+import { type Figure, type NgonDTO, FigureType, ReadableDto } from '../figures';
 
 export class NGon implements Figure {
-	private radius: number;
-	private numSides: number;
-	private pointSpeed: number;
-	private rotationSpeed: THREE.Vector3;
+	private radius: number = 1;
+	private numSides: number = 4;
+	private pointSpeed: number = 0;
+	private rotationSpeed: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
 	private time: number = 0;
-	private edgeLength: number;
-	private _object3d: THREE.Object3D;
-	private _pointMesh: THREE.Mesh;
+	private edgeLength: number = 0;
+	private _object3d: THREE.Object3D = new THREE.Object3D();
+	private _pointMesh: THREE.Mesh = new THREE.Mesh();
+
 	public get object3d(): THREE.Object3D {
 		return this._object3d;
 	}
 
-	constructor(dto: NgonDTO) {
-		this.radius = dto.radius;
-		this.numSides = dto.numSides;
-		this.pointSpeed = dto.pointSpeed;
-		this.rotationSpeed = new THREE.Vector3(dto.rotationSpeed.x, dto.rotationSpeed.y, dto.rotationSpeed.z);
-		this.edgeLength = 2 * this.radius * Math.sin(Math.PI / this.numSides);
+	constructor(readableDTO: ReadableDto<NgonDTO, string>) {
+		const dto = readableDTO.dtoWrapper;
 
+		readableDTO.subscribe((dto: NgonDTO) => {
+			this._initFromDTO(dto);
+			this._object3d = this._updateGeometry();
+		});
+		this._initFromDTO(dto);
+		this._object3d = this._updateGeometry();
+	}
+
+	private _updateGeometry(): THREE.Object3D {
 		const corners = this.cornersPosition();
 		// corners.push(corners[0]);
 
@@ -39,7 +45,19 @@ export class NGon implements Figure {
 		point.position.set(pointPosition.x, pointPosition.y, pointPosition.z);
 		obj.add(point);
 		this._pointMesh = point;
-		this._object3d = obj;
+		return obj;
+	}
+
+	private _initFromDTO(dto: NgonDTO): void {
+		this.radius = dto.radius;
+		this.numSides = dto.numSides;
+		this.pointSpeed = dto.pointSpeed;
+		this.rotationSpeed = new THREE.Vector3(
+			dto.rotationSpeedX,
+			dto.rotationSpeedY,
+			dto.rotationSpeedZ
+		);
+		this.edgeLength = 2 * this.radius * Math.sin(Math.PI / this.numSides);
 	}
 
 	public figureType(): FigureType {
@@ -90,9 +108,9 @@ export class NGon implements Figure {
 		this.time = time;
 		const pointPos = this.getLocalPoint().add(point);
 		this._pointMesh.position.set(pointPos.x, pointPos.y, pointPos.z);
-        this._object3d.position.set(point.x, point.y, point.z);
-		const rotation = this.rotationSpeed * time;
-		this._object3d.rotation.set(0, 0, rotation);
+		this._object3d.position.set(point.x, point.y, point.z);
+		// const rotation = this.rotationSpeed * time;
+		// this._object3d.rotation.set(0, 0, rotation);
 	}
 
 	private cornersPosition(): THREE.Vector3[] {

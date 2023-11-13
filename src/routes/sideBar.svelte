@@ -15,18 +15,17 @@
 
 	function add_circle() {
 		figuresData.update((fd) => {
-			
-			const newCircle:CircleDTO = <CircleDTO>{
+			const newCircle: CircleDTO = <CircleDTO>{
 				figureType: FigureType.Circle,
 				radius: 1.3,
 				pointSpeed: 0,
-				rotationSpeed: {
-					x: 0,
-					y: 0,
-					z: 0
-				}
+				rotationSpeedX: 0,
+				rotationSpeedY: 0,
+				rotationSpeedZ: 0
 			};
-			const readableCircle:ReadableDto<DTO> = new ReadableDto(newCircle);
+			const readableCircle: ReadableDto<DTO, string> = new ReadableDto(
+				newCircle
+			) as unknown as ReadableDto<DTO, string>;
 			fd.push(readableCircle);
 			return [...fd];
 		});
@@ -35,17 +34,19 @@
 
 	function add_ngon() {
 		figuresData.update((fd) => {
-			fd.push(<NgonDTO>{
+			const newNgon = <NgonDTO>{
 				figureType: FigureType.Square,
 				numSides: 4,
 				radius: 1.3,
 				pointSpeed: 0,
-				rotationSpeed: {
-					x: 0,
-					y: 0,
-					z: 0
-				}
-			});
+				rotationSpeedX: 0,
+				rotationSpeedY: 0,
+				rotationSpeedZ: 0
+			};
+			const readableFigure: ReadableDto<DTO, string> = new ReadableDto(
+				newNgon
+			) as unknown as ReadableDto<DTO, string>;
+			fd.push(readableFigure);
 			return [...fd];
 		});
 		reset();
@@ -61,7 +62,7 @@
 </script>
 
 <aside>
-	<GeneralSettingsComponent {reset}  />
+	<GeneralSettingsComponent {reset} />
 	{#each $figuresData as figure, i}
 		{#if figure.figureType == FigureType.Circle}
 			<CircleComponent {i} {figure} {remove_figure} {reset} />
@@ -86,7 +87,7 @@
 
 <style lang="less">
 	aside {
-		width: 35em;
+		width: 30em;
 		padding: 1em;
 	}
 </style>
