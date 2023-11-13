@@ -7,9 +7,8 @@
 	import Card from '@smui/card';
 	import type { NgonDTO } from '$lib';
 	export let i: number;
-	export let figure: NgonDTO;
+	export let figure: any;
 	export let remove_figure: (i: number) => void;
-	export let reset: () => void;
 </script>
 
 <Card>

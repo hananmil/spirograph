@@ -10,15 +10,6 @@
 	export let i: number;
 	export let figure: any;
 	export let remove_figure: (i: number) => void;
-	export let reset: () => void;
-	function update() {
-		console.log('update');
-		figuresData.update((fd) => {
-			fd[i] = figure;
-			return [...fd];
-		});
-		reset();
-	}
 </script>
 
 <Card>

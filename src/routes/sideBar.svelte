@@ -65,10 +65,10 @@
 	<GeneralSettingsComponent {reset} />
 	{#each $figuresData as figure, i}
 		{#if figure.figureType == FigureType.Circle}
-			<CircleComponent {i} {figure} {remove_figure} {reset} />
+			<CircleComponent {i} {figure} {remove_figure}  />
 		{/if}
 		{#if figure.figureType == FigureType.Square}
-			<NgonComponent {i} {figure} {remove_figure} {reset} />
+			<NgonComponent {i} {figure}  {remove_figure}  />
 		{/if}
 	{/each}
 	<Card>

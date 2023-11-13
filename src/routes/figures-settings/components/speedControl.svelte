@@ -16,11 +16,13 @@
 	export let label: string = 'value';
 	export let value: number = 0;
 	let speedSlider: Slider;
+	let input1: Input;
 </script>
 
 <FormField align="end" style="display: {disabled ? 'none' : 'flex'}">
 	<span class="label">{label}</span>	
 	<Input bind:value
+		bind:this={input1}
 		placeholder="Search"
 		min={min}
 		max={max}

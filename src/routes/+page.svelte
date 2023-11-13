@@ -51,8 +51,7 @@
 
 		for (let fig of figures) {
 			fig.moveTo(location, $stateStore.time);
-			const point = fig.getPoint();
-			location = location.add(point);
+			location = fig.getPoint();
 		}
 
 		trace.addVertex(location.x, location.y, location.z);
