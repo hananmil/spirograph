@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { showFigures, showDots, isPaused, rotateCamera, cameraFocalDistance, stepsPerSecond } from '$lib';
+	import { showFigures, showDots, isPaused, rotateCamera, cameraFOV, stepsPerSecond } from '$lib';
 	import Button, { Icon, Label } from '@smui/button';
 	import Card, { Content } from '@smui/card';
 	import Checkbox from '@smui/checkbox';
@@ -22,13 +22,13 @@
 		</FormField>
 		<FormField>
 			<span slot="label" style="padding-right: 12px; width: max-content; display: block;">
-				{$cameraFocalDistance}
+				{$cameraFOV}
 			</span>
 			<Icon class="material-icons">
 				<span class="material-symbols-outlined"> videocam </span>
 				<span class="material-symbols-outlined"> square_foot </span>
 			</Icon>
-			<Slider bind:value={$cameraFocalDistance} min={10} max={200} style="flex-grow: 1;" />
+			<Slider bind:value={$cameraFOV} min={10} max={200} style="flex-grow: 1;" />
 			<!-- <input type="range" bind:value={$cameraFocalDistance} min={10} max={200} step="1" /> -->
 		</FormField>
 		<FormField>

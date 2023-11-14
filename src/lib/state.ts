@@ -37,10 +37,10 @@ function createStateStore(){
 }
 
 export const rotateCamera:Writable<boolean> = writable(true);
-export const cameraFocalDistance:Writable<number> = writable(50);
+export const cameraFOV:Writable<number> = writable(50);
 export const showFigures:Writable<boolean> = writable(true);
 export const showDots:Writable<boolean> = writable(true);
 export const isPaused:Writable<boolean> = writable(false);
 export const stateStore = createStateStore();
-export const figuresData: Writable<ReadableDto<DTO,string>[]> = writable([]);
+export const figuresData: Writable<ReadableDto<DTO>[]> = writable([]);
 export const stepsPerSecond: Writable<number> = writable(1);

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { SceneComponentBase } from "./sceneComponentBase";
-import { cameraFocalDistance, rotateCamera } from '../state';
+import { cameraFOV, rotateCamera } from '../state';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 export class SimCamera extends SceneComponentBase<THREE.Camera> {
@@ -23,7 +23,7 @@ export class SimCamera extends SceneComponentBase<THREE.Camera> {
 		this._camera.lookAt(0, 0, 0);
 		this._camera.updateProjectionMatrix();
 		this.items.push(this._camera);
-		cameraFocalDistance.subscribe(this._setFocalDistance);
+		cameraFOV.subscribe(this._setFocalDistance);
 		rotateCamera.subscribe(this._setRotateCamera);
 	}
 
