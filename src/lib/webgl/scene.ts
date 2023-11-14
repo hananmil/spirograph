@@ -11,6 +11,27 @@ import { LineSegments2 } from 'three/examples/jsm/lines/LineSegments2';
 import { LineSegmentsGeometry } from 'three/examples/jsm/lines/LineSegmentsGeometry.js';
 import { Line2 } from 'three/examples/jsm/lines/Line2.js';
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js';
+
+class CustomSinCurve extends THREE.LineCurve3 {
+	private scale: number;
+	constructor( scale:number ) {
+
+		super();
+		this.scale = scale;
+
+	}
+
+	public getPoint( t:number ):THREE.Vector3 {
+
+		const tx = t * 3 - 1.5;
+		const ty = Math.sin( 2 * Math.PI * t );
+		const tz = 0;
+		return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
+
+	}
+
+}
+
 export class SimScene {
 	private _canvas: HTMLCanvasElement | null = null;
 	private _scene: Scene;
@@ -36,6 +57,7 @@ export class SimScene {
 		const camera = new SimCamera();
 		this._camera = camera;
 		camera.addToScene(scene);
+		
 
 	}
 

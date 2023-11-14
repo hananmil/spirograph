@@ -49,7 +49,7 @@
 
 		for (let fig of figures) {
 			fig.moveTo(location, $stateStore.time);
-			location = fig.getPoint();
+			location = fig.pointPosition();
 		}
 
 		// trace.addVertex(location.x, location.y, location.z);
@@ -66,9 +66,9 @@
 	}
 
 	function initial_draw() {
-		createAxis(0, 0xffff0000);
-		createAxis(1, 0xff00ff00);
-		createAxis(2, 0xff0000ff);
+		createAxis(0, 0xffe4f1ee);
+		createAxis(1, 0xffd9edf8);
+		createAxis(2, 0xfffdffb6);
 	}
 
 	function createAxis(
@@ -82,9 +82,9 @@
 		let lineFactory = new TwoPointsLineFactory(color, 0.08);
 		let p1 = new THREE.Vector3().setComponent(axis, min);
 		let p2 = new THREE.Vector3().setComponent(axis, max);
-		scene.scene.add(lineFactory.createTwoPointLine(p1, p2));
-
-		lineFactory = new TwoPointsLineFactory(color, 0.05);
+		const axisMesh = lineFactory.createTwoPointLine(p1, p2);
+		
+		lineFactory = new TwoPointsLineFactory(color, 0.02);
 		let tickPossition = (max - min) / ticksDistance;
 		for (let axis2 = 0; axis2 < 3; axis2++) {
 			for (let i = 0; i <= tickPossition; i++) {
@@ -92,9 +92,10 @@
 				p2 = new THREE.Vector3().setComponent(axis, min + i * ticksDistance);
 				p1.setComponent((axis + axis2) % 3, -tickLen);
 				p2.setComponent((axis + axis2) % 3, tickLen);
-				scene.scene.add(lineFactory.createTwoPointLine(p1, p2));
+				axisMesh.add(lineFactory.createTwoPointLine(p1, p2));
 			}
 		}
+		scene.scene.add(axisMesh);
 	}
 
 
