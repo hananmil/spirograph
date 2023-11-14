@@ -3,7 +3,14 @@ import { DirectionalLight, HemisphereLight, PerspectiveCamera, Scene, WebGLRende
 import * as THREE from 'three';
 import { SimCamera } from './camera';
 import { SimLights } from './lights';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
+import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
+
+import { LineSegments2 } from 'three/examples/jsm/lines/LineSegments2';
+import { LineSegmentsGeometry } from 'three/examples/jsm/lines/LineSegmentsGeometry.js';
+import { Line2 } from 'three/examples/jsm/lines/Line2.js';
+import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js';
 export class SimScene {
 	private _canvas: HTMLCanvasElement | null = null;
 	private _scene: Scene;
@@ -29,7 +36,7 @@ export class SimScene {
 		const camera = new SimCamera();
 		this._camera = camera;
 		camera.addToScene(scene);
-		
+
 	}
 
 	animate = (time: DOMHighResTimeStamp) => {
@@ -54,10 +61,18 @@ export class SimScene {
 
 	public createScene(el: HTMLCanvasElement) {
 		this._canvas = el;
-		this._renderer = new WebGLRenderer({ antialias: true, canvas: el });
+		this._renderer = new WebGLRenderer({ antialias: true, canvas: el , alpha: true,  });
 		this.resize();
 		this.animate(0);
 		window.addEventListener('resize', this.resize);
+		
+		const controls = new OrbitControls(this._camera.activeInstance, this._canvas);
+		controls.enableDamping = true;
+		controls.dampingFactor = 0.05;
+		controls.screenSpacePanning = false;
+		controls.minDistance = 5;
+		controls.maxDistance = 1000;
+		controls.maxPolarAngle = Math.PI / 2;	
 	}
 }
 

@@ -6,13 +6,13 @@
 	import SideBar from './sideBar.svelte';
 	import { figuresData, stateStore, isPaused, stepsPerSecond } from '$lib/state';
 	import { SimScene } from '../lib/webgl/scene';
-	import { Line } from '../lib/webgl/line';
+	import { TwoPointsLineFactory } from '../lib/webgl/line';
 	import * as THREE from 'three';
 
 	let sceneCanvas: HTMLCanvasElement;
 
 	let scene: SimScene;
-	let trace: Line;
+	// let trace: Line;
 	let lineGeometry: THREE.Object3D;
 
 	let figures: Figure[] = [];
@@ -36,9 +36,7 @@
 		if (lineGeometry) {
 			scene.scene.remove(lineGeometry);
 		}
-		trace = new Line(100000, 0xffff00ff);
-		lineGeometry = trace.line;
-		scene.scene.add(lineGeometry);
+		// trace = new Line(100000, 0xffff00ff);
 		initial_draw();
 	}
 
@@ -54,7 +52,12 @@
 			location = fig.getPoint();
 		}
 
-		trace.addVertex(location.x, location.y, location.z);
+		// trace.addVertex(location.x, location.y, location.z);
+		// if (trace.count == 2)
+		// {
+		// 	lineGeometry = trace.line;
+		// 	scene.scene.add(lineGeometry);
+		// }
 
 		stateStore.updateTime((time: number) => {
 			const timeFactor = 0.01;
@@ -63,35 +66,37 @@
 	}
 
 	function initial_draw() {
-		if (!scene) return;
-		const axis_x = new Line(2, 0xffff0000);
-		const axis_y = new Line(2, 0xffffff00);
-		const axis_z = new Line(2, 0xff00ffff);
-		axis_x.addVertex(-100, 0, 0);
-		axis_x.addVertex(100, 0, 0);
-		axis_y.addVertex(0, -100, 0);
-		axis_y.addVertex(0, 100, 0);
-		axis_z.addVertex(0, 0, -100);
-		axis_z.addVertex(0, 0, 100);
-		scene.scene.add(axis_x.line);
-		scene.scene.add(axis_y.line);
-		scene.scene.add(axis_z.line);
+		createAxis(0, 0xffff0000);
+		createAxis(1, 0xff00ff00);
+		createAxis(2, 0xff0000ff);
+	}
 
-		for (let i = -100; i <= 100; i++) {
-			let line = new Line(2, 0xff00ffff);
-			line.addVertex(-0.1, 0, i);
-			line.addVertex(0.1, 0, i);
-			scene.scene.add(line.line);
-			let line2 = new Line(2, 0xffff0000);
-			line2.addVertex(i, 0, -0.1);
-			line2.addVertex(i, 0, 0.1);
-			scene.scene.add(line2.line);
-			let line3 = new Line(2, 0xffffff00);
-			line3.addVertex(-0.1, i, 0);
-			line3.addVertex(0.1, i, 0);
-			scene.scene.add(line3.line);
+	function createAxis(
+		axis: number,
+		color: number,
+		min: number = -100,
+		max: number = 100,
+		ticksDistance: number = 1,
+		tickLen: number = 0.13
+	) {
+		let lineFactory = new TwoPointsLineFactory(color, 0.08);
+		let p1 = new THREE.Vector3().setComponent(axis, min);
+		let p2 = new THREE.Vector3().setComponent(axis, max);
+		scene.scene.add(lineFactory.createTwoPointLine(p1, p2));
+
+		lineFactory = new TwoPointsLineFactory(color, 0.05);
+		let tickPossition = (max - min) / ticksDistance;
+		for (let axis2 = 0; axis2 < 3; axis2++) {
+			for (let i = 0; i <= tickPossition; i++) {
+				p1 = new THREE.Vector3().setComponent(axis, min + i * ticksDistance);
+				p2 = new THREE.Vector3().setComponent(axis, min + i * ticksDistance);
+				p1.setComponent((axis + axis2) % 3, -tickLen);
+				p2.setComponent((axis + axis2) % 3, tickLen);
+				scene.scene.add(lineFactory.createTwoPointLine(p1, p2));
+			}
 		}
 	}
+
 
 	function resize() {
 		sceneCanvas.width = window.innerWidth - 300;

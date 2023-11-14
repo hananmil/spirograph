@@ -1,33 +1,37 @@
-import * as THREE from 'three';
+import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
+import { Line2 } from 'three/examples/jsm/lines/Line2';
+import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry';
+import { LineSegmentsGeometry } from 'three/examples/jsm/lines/LineSegmentsGeometry';
+import { LineSegments2 } from 'three/examples/jsm/lines/LineSegments2';
+import * as GeometryUtils from 'three/examples/jsm/utils/GeometryUtils.js';
+export class TwoPointsLineFactory {
+	private material:LineMaterial;
+	
+	constructor(private color:number,private width:number=0.05) {
+		this.material = new LineMaterial( {
+			color: this.color,
+			linewidth: width, // in world units with size attenuation, pixels otherwise
+			worldUnits: true,
+			// vertexColors: true,
+			transparent: true,
+			opacity: 0.9,
+			depthTest: false,
+			visible: true,
+			//resolution:  // to be set by renderer, eventually
 
-export class Line {
-	private geometry: THREE.BufferGeometry;
-	private numVertices: number = 0;
-	private material: THREE.LineBasicMaterial;
-	private lineObject: THREE.Object3D | null = null;
-	constructor(maxVertices: number, color: number) {
-		this.material = new THREE.LineBasicMaterial({ color });
-
-		const buffer = new Float32Array(maxVertices * 3);
-
-		this.geometry = new THREE.BufferGeometry();
-		this.geometry.setAttribute('position', new THREE.Float32BufferAttribute(buffer, 3));
-		this.geometry.setDrawRange(0, this.numVertices);
+		} );
 	}
 
-	public addVertex(x: number, y: number, z: number) {
-		const positions = this.geometry.getAttribute('position') as THREE.Float32BufferAttribute;
-		positions.setXYZ(this.numVertices, x, y, z);
-		this.numVertices++;
-		positions.needsUpdate = true;
-		this.geometry.setDrawRange(0, this.numVertices);
-	}
+	public createTwoPointLine(p1:THREE.Vector3,p2:THREE.Vector3):THREE.Object3D {
+		const positions = p1.toArray().concat(p2.toArray());
 
-	public get line():THREE.Object3D {
-		if (!this.lineObject) {
-			this.lineObject = new THREE.Line(this.geometry, this.material);
-			this.lineObject.frustumCulled = true;
-		}
-		return this.lineObject;
+		const geometry = new LineGeometry();
+		geometry.setPositions(positions);
+
+		const lineObject = new Line2(geometry, this.material);
+		lineObject.frustumCulled = true;
+		lineObject.computeLineDistances();
+		lineObject.scale.set(1,1,1);
+		return lineObject;
 	}
 }

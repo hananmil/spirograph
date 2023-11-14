@@ -1,52 +1,29 @@
 import * as THREE from 'three';
 import { type Figure, type CircleDTO, FigureType, ReadableDto } from '../figures';
+import { FigureBase } from './baseFigure';
 
-export class Circle implements Figure {
-	private radius: number;
-	private pointSpeed: number;
-	private rotationSpeed: THREE.Vector3;
+export class Circle extends FigureBase<CircleDTO> {
+	private radius: number = 0;
+	private pointSpeed: number = 0;
+	private rotationSpeed: THREE.Vector3 = new THREE.Vector3();
 	private time: number = 0;
-	private _objectMesh: THREE.Object3D;
-	private _pointMesh: THREE.Object3D;
+	private _objectMesh: THREE.Object3D|null = null;
 
 	public get object3d(): THREE.Object3D {
+		if (this._objectMesh === null) {
+			throw new Error('Object mesh is null');
+		}
 		return this._objectMesh;
 	}
 
 	constructor(readableDTO: ReadableDto<CircleDTO, string>) {
-		const dto = readableDTO.dtoWrapper;
-
-		this.radius = dto.radius;
-		this.pointSpeed = dto.pointSpeed;
-		this.rotationSpeed = new THREE.Vector3(
-			dto.rotationSpeedX,
-			dto.rotationSpeedY,
-			dto.rotationSpeedZ
-		);
-		const updatedGeometry = this._updateGeometry(null);
-		this._objectMesh = updatedGeometry.obj;
-		this._pointMesh = updatedGeometry.point;
-
-		readableDTO.subscribe((dto: CircleDTO) => {
-			console.log('Circle updated');
-			this.radius = dto.radius;
-			this.pointSpeed = dto.pointSpeed;
-			this.rotationSpeed = new THREE.Vector3(
-				dto.rotationSpeedX,
-				dto.rotationSpeedY,
-				dto.rotationSpeedZ
-			);
-			const updatedGeometry = this._updateGeometry(this._objectMesh);
-			this._objectMesh = updatedGeometry.obj;
-			this._pointMesh = updatedGeometry.point;
-		});
-	}
-
-	public figureType(): FigureType {
-		return FigureType.Circle;
+		super(FigureType.Circle, readableDTO);
 	}
 
 	public getPoint(): THREE.Vector3 {
+		if (this._pointMesh === null) {
+			throw new Error('Point mesh is null');
+		}
 		return this._pointMesh.getWorldPosition(new THREE.Vector3());
 	}
 
@@ -57,6 +34,19 @@ export class Circle implements Figure {
 		const pointLocal = this._getPointLocal();
 		this._pointMesh.position.set(pointLocal.x, pointLocal.y, pointLocal.z);
 		this._objectMesh.rotation.set(rotationVector.x, rotationVector.y, rotationVector.z);
+	}
+
+	protected override initFromDto(dto: CircleDTO): void {
+		this.radius = dto.radius;
+		this.pointSpeed = dto.pointSpeed;
+		this.rotationSpeed = new THREE.Vector3(
+			dto.rotationSpeedX,
+			dto.rotationSpeedY,
+			dto.rotationSpeedZ
+		);
+		const updatedGeometry = this._updateGeometry(this._objectMesh);
+		this._objectMesh = updatedGeometry.obj;
+		this._pointMesh = updatedGeometry.point;
 	}
 
 	private _getPointLocal(): THREE.Vector3 {
@@ -78,7 +68,7 @@ export class Circle implements Figure {
 
 		const obj = parent ?? new THREE.Object3D();
 
-		const ring = new THREE.TorusGeometry(1, 0.01);
+		const ring = new THREE.TorusGeometry(1, 0.02);
 		ring.scale(this.radius, this.radius, this.radius);
 		obj.add(new THREE.Mesh(ring, new THREE.MeshBasicMaterial({ color: 0xffffffff })));
 		const point = new THREE.Mesh(

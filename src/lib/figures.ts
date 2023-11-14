@@ -21,8 +21,8 @@ export interface DTOVector {
 	z: number;
 }
 export interface Figure {
-	figureType(): FigureType;
-	getPoint(): THREE.Vector3;
+	figureType: FigureType;
+	pointPosition(): THREE.Vector3;
 	moveTo(point: THREE.Vector3, time: number): void;
 	get object3d(): THREE.Object3D;
 }
@@ -44,14 +44,13 @@ export interface NgonDTO extends DTO {
 	numSides: number;
 }
 
-export class ReadableDto<DTO extends Record<string | symbol, unknown>, T extends keyof DTO>
-	implements Readable<DTO>
-{
+export class ReadableDto<DTO extends Record<string|symbol,any>> implements Readable<DTO> {
 	[key: string | symbol]: unknown;
 	private _subscribeList: Subscriber<DTO>[];
 	private _dto: Writable<DTO>;
-
+	private dict = new <string | symbol>();
 	public get dtoWrapper(): DTO {
+		
 		return this as unknown as DTO;
 	}
 
@@ -70,9 +69,7 @@ export class ReadableDto<DTO extends Record<string | symbol, unknown>, T extends
 
 	private _createDynamicSetter = (propertyName: string | symbol) => {
 		return {
-			set(this: ReadableDto<DTO, T>, newValue: DTO[T]) {
-				// console.log(`Setting ${String(propertyName)} to ${newValue}`);
-				// Custom logic for the setter
+			set(this: ReadableDto<DTO>, newValue: DTO[typeof propertyName]) {
 				this._dto.update((dto: DTO) => {
 					Object.assign(dto, { [propertyName]: newValue });
 					return dto;
@@ -81,12 +78,9 @@ export class ReadableDto<DTO extends Record<string | symbol, unknown>, T extends
 					// console.log(`Calling subscriber for ${String(propertyName)} updated`);
 					subscriber(this.dtoWrapper);
 				});
-			},
-			get(this: ReadableDto<DTO, T>): DTO[T] {
-				console.log(
-					// `Getting ${String(propertyName)} to ${JSON.stringify(get(this._dto)[propertyName])}`
-				);
-				return get(this._dto)[propertyName] as DTO[T];
+		},
+			get(this: ReadableDto<DTO>): any {
+				return get(this._dto)[propertyName];
 			}
 		};
 	};

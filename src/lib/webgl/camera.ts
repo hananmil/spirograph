@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { SceneComponentBase } from "./sceneComponentBase";
 import { cameraFocalDistance, rotateCamera } from '../state';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
 export class SimCamera extends SceneComponentBase<THREE.Camera> {
 	resize(aspect: number) {
 		this._camera.aspect = aspect;
@@ -23,6 +25,10 @@ export class SimCamera extends SceneComponentBase<THREE.Camera> {
 		this.items.push(this._camera);
 		cameraFocalDistance.subscribe(this._setFocalDistance);
 		rotateCamera.subscribe(this._setRotateCamera);
+	}
+
+	override addToScene(scene: THREE.Scene): void {
+		super.addToScene(scene);
 	}
 
 	private _setRotateCamera = (rotateCamera: boolean) => {
