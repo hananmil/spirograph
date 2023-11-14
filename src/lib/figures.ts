@@ -29,28 +29,24 @@ export interface Figure {
 
 export interface DTO extends Record<string | symbol, unknown> {
 	figureType: FigureType;
+	size: number;
 	rotationSpeedX: number;
 	rotationSpeedY: number;
 	rotationSpeedZ: number;
 	pointSpeed: number;
 }
 
-export interface CircleDTO extends DTO {
-	radius: number;
-}
+export interface CircleDTO extends DTO {}
 
 export interface NgonDTO extends DTO {
-	radius: number;
 	numSides: number;
 }
 
-export class ReadableDto<DTO extends Record<string|symbol,any>> implements Readable<DTO> {
+export class ReadableDto<DTO extends Record<string | symbol, unknown>> implements Readable<DTO> {
 	[key: string | symbol]: unknown;
 	private _subscribeList: Subscriber<DTO>[];
 	private _dto: Writable<DTO>;
-	private dict = new <string | symbol>();
 	public get dtoWrapper(): DTO {
-		
 		return this as unknown as DTO;
 	}
 
@@ -78,7 +74,7 @@ export class ReadableDto<DTO extends Record<string|symbol,any>> implements Reada
 					// console.log(`Calling subscriber for ${String(propertyName)} updated`);
 					subscriber(this.dtoWrapper);
 				});
-		},
+			},
 			get(this: ReadableDto<DTO>): any {
 				return get(this._dto)[propertyName];
 			}
