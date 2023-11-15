@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { stateStore, type CircleDTO, type ReadableDto } from '$lib';
 	import { T } from '@threlte/core';
-	import { onMount } from 'svelte';
 	import type { Vector3Tuple } from 'three';
 
 	export let dto: ReadableDto<CircleDTO>;
@@ -37,9 +36,6 @@
         return result;
     }
 
-	onMount(() => {
-		console.log(dto);
-	});
 </script>
 
 <T.Object3D rotation={objectRotation}>

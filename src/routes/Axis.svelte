@@ -20,17 +20,17 @@
 	for (let i = min; i <= max; i += ticksDistance) {
 		const tick = new Vector3(0, 0, 0).setComponent(axis, i);
 		tickPositions.push([
-			tick.clone().setComponent((axis+2)%3,  - 0.15),
-			tick.clone().setComponent((axis+2)%3,  + 0.15)
+			tick.clone().setComponent((axis+2)%3,  - 0.1),
+			tick.clone().setComponent((axis+2)%3,  + 0.1)
 		]);
         tickPositions.push([
-			tick.clone().setComponent((axis+1)%3,  - 0.15),
-			tick.clone().setComponent((axis+1)%3,  + 0.15)
+			tick.clone().setComponent((axis+1)%3,  - 0.1),
+			tick.clone().setComponent((axis+1)%3,  + 0.1)
 		]);
 	}
 </script>
  <T.Mesh>
-    <MeshLineGeometry points={points} shape={'custom'} shapeFunction={n=>0.1} />
+    <MeshLineGeometry points={points} shape={'custom'} shapeFunction={n=>0.01} />
     <MeshLineMaterial 
         {color} 
         side={THREE.DoubleSide}/>
@@ -38,7 +38,7 @@
 
 {#each tickPositions as offset}
 	<T.Mesh>
-		<MeshLineGeometry points={offset} shape={'custom'}  shapeFunction={n=>0.05}/>
+		<MeshLineGeometry points={offset} shape={'custom'}  shapeFunction={n=>0.005}/>
 		<MeshLineMaterial attach="material" depthTest={true} {color} side={THREE.DoubleSide}  />
 	</T.Mesh>
 {/each} 

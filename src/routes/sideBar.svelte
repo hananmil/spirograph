@@ -1,15 +1,13 @@
 <script lang="ts">
-	import FormField from '@smui/form-field';
 	import Button, { Icon as ButtonIcon, Label as ButtonLabel } from '@smui/button';
-	import Checkbox from '@smui/checkbox';
 	import Card, { Content as CardContent } from '@smui/card';
 	import { type CircleDTO, type NgonDTO, FigureType, ReadableDto, type DTO } from '$lib';
 
-	import CircleComponent from './figures-settings/circleComponent.svelte';
-	import NgonComponent from './figures-settings/ngonComponent.svelte';
-	import { figuresData, isPaused, showDots, showFigures } from '$lib/state';
+	import CircleComponent from './settings/circleSettings.svelte';
+	import NgonComponent from './settings/ngonSettings.svelte';
+	import { figuresData } from '$lib/state';
 
-	import GeneralSettingsComponent from './figures-settings/generalSettingsComponent.svelte';
+	import GeneralSettingsComponent from './settings/generalSettings.svelte';
 
 	function add_circle() {
 		figuresData.update((fd) => {

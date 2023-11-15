@@ -1,9 +1,6 @@
 <script lang="ts">
-	import { FigureType, ReadableDto, cameraFOV, figuresData, type DTO, stateStore } from '$lib';
-	import { T, type CurrentWritable, type ThrelteContext } from '@threlte/core';
-	import { useRender } from '@threlte/core';
-	import { onMount } from 'svelte';
-	import type { AmbientLight, Camera, DirectionalLight, PerspectiveCamera } from 'three';
+	import { FigureType, cameraFOV, figuresData, stateStore } from '$lib';
+	import { T } from '@threlte/core';
 	import Axis from './Axis.svelte';
 	import { Grid, OrbitControls, Sky } from '@threlte/extras';
 	import Circle from './figures/Circle.svelte';
