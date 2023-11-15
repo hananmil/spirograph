@@ -16,7 +16,7 @@
 	<Content>
 		<h3>Circle {i + 1}</h3>
 		<SpeedControl
-			bind:value={figure.radius}
+			bind:value={figure.size}
 			min={0.1}
 			max={10}
 			step={0.1}

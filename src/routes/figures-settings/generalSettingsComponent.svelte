@@ -2,12 +2,12 @@
 	import { showFigures, showDots, isPaused, rotateCamera, cameraFOV, stepsPerSecond } from '$lib';
 	import Button, { Icon, Label } from '@smui/button';
 	import Card, { Content } from '@smui/card';
-	import Checkbox from '@smui/checkbox';
-	import Swtich from '@smui/switch';
 	import Slider from '@smui/slider';
 	import FormField from '@smui/form-field';
-	import Switch from '@smui/switch/src/Switch.svelte';
-	export let reset: () => void;
+	import Switch from '@smui/switch';
+	 function reset() {	 
+			console.log("reset");
+	};
 </script>
 
 <Card>

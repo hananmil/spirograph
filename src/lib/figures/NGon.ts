@@ -3,7 +3,7 @@ import { type Figure, type NgonDTO, FigureType, ReadableDto } from '../figures';
 
 export class NGon implements Figure {
 	private radius: number = 1;
-	private numSides: number = 4;
+	private numCorners: number = 4;
 	private pointSpeed: number = 0;
 	private rotationSpeed: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
 	private time: number = 0;
@@ -38,7 +38,7 @@ export class NGon implements Figure {
 		const obj = parent ?? new THREE.Object3D();
 		const path = new THREE.CatmullRomCurve3(corners, true, 'catmullrom', 0.01);
 
-		const geometry = new THREE.TubeGeometry(path, 20 * this.numSides, 0.01, 12, true);
+		const geometry = new THREE.TubeGeometry(path, 20 * this.numCorners, 0.01, 12, true);
 		const material = new THREE.MeshBasicMaterial({ color: 4294967295, wireframe: true });
 
 		obj.add(new THREE.Mesh(geometry, material));
@@ -54,18 +54,18 @@ export class NGon implements Figure {
 
 	private _initFromDTO(dto: NgonDTO): void {
 		this.radius = dto.radius;
-		this.numSides = dto.numSides;
+		this.numCorners = dto.numCorners;
 		this.pointSpeed = dto.pointSpeed;
 		this.rotationSpeed = new THREE.Vector3(
 			dto.rotationSpeedX,
 			dto.rotationSpeedY,
 			dto.rotationSpeedZ
 		);
-		this.edgeLength = 2 * this.radius * Math.sin(Math.PI / this.numSides);
+		this.edgeLength = 2 * this.radius * Math.sin(Math.PI / this.numCorners);
 	}
 
 	public figureType(): FigureType {
-		return FigureType.Square;
+		return FigureType.NGon;
 	}
 
 	public getPoint(): THREE.Vector3 {
@@ -74,7 +74,7 @@ export class NGon implements Figure {
 
 	private getLocalPoint(): THREE.Vector3 {
 		// Calculate the perimeter of the square
-		const perimeter = this.numSides * this.edgeLength;
+		const perimeter = this.numCorners * this.edgeLength;
 
 		const speed = (this.pointSpeed * perimeter) / (2 * Math.PI);
 
@@ -92,7 +92,7 @@ export class NGon implements Figure {
 		const positionOnSide = distanceTraveled % this.edgeLength;
 		const corners = this.cornersPosition();
 		const p1 = corners[sideIndex];
-		const p2 = corners[(sideIndex + 1) % this.numSides];
+		const p2 = corners[(sideIndex + 1) % this.numCorners];
 
 		// Determine the point coordinates
 		const point = p2
@@ -117,8 +117,8 @@ export class NGon implements Figure {
 
 	private cornersPosition(): THREE.Vector3[] {
 		const points: THREE.Vector3[] = [];
-		for (let i = 0; i < this.numSides; i++) {
-			const angle = (2 * Math.PI * i) / this.numSides;
+		for (let i = 0; i < this.numCorners; i++) {
+			const angle = (2 * Math.PI * i) / this.numCorners;
 			const x = this.radius * Math.cos(angle);
 			const y = this.radius * Math.sin(angle);
 			points.push(new THREE.Vector3(x, y, 0));

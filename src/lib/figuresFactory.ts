@@ -17,7 +17,7 @@ export class FiguresFactory {
 		switch (dto.dtoWrapper.figureType) {
 			case FigureType.Circle:
 				return new Circle(dto as unknown as ReadableDto<CircleDTO, string>);
-			case FigureType.Square:
+			case FigureType.NGon:
 				return new NGon(dto as unknown as ReadableDto<NgonDTO, string>);
 			default:
 				throw new Error('Invalid figure type');

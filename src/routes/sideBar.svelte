@@ -11,45 +11,41 @@
 
 	import GeneralSettingsComponent from './figures-settings/generalSettingsComponent.svelte';
 
-	export let reset: () => void;
-
 	function add_circle() {
 		figuresData.update((fd) => {
 			const newCircle: CircleDTO = <CircleDTO>{
 				figureType: FigureType.Circle,
-				radius: 1.3,
+				size: 1.3,
 				pointSpeed: 0,
 				rotationSpeedX: 0,
 				rotationSpeedY: 0,
 				rotationSpeedZ: 0
 			};
-			const readableCircle: ReadableDto<DTO, string> = new ReadableDto(
+			const readableCircle: ReadableDto<DTO> = new ReadableDto(
 				newCircle
-			) as unknown as ReadableDto<DTO, string>;
+			) as unknown as ReadableDto<DTO>;
 			fd.push(readableCircle);
 			return [...fd];
 		});
-		reset();
 	}
 
 	function add_ngon() {
 		figuresData.update((fd) => {
 			const newNgon = <NgonDTO>{
-				figureType: FigureType.Square,
-				numSides: 4,
-				radius: 1.3,
+				figureType: FigureType.NGon,
+				numCorners: 4,
+				size: 1.3,
 				pointSpeed: 0,
 				rotationSpeedX: 0,
 				rotationSpeedY: 0,
 				rotationSpeedZ: 0
 			};
-			const readableFigure: ReadableDto<DTO, string> = new ReadableDto(
+			const readableFigure: ReadableDto<DTO> = new ReadableDto(
 				newNgon
-			) as unknown as ReadableDto<DTO, string>;
+			) as unknown as ReadableDto<DTO>;
 			fd.push(readableFigure);
 			return [...fd];
 		});
-		reset();
 	}
 
 	function remove_figure(i: number) {
@@ -57,17 +53,16 @@
 			fd.splice(i, 1);
 			return [...fd];
 		});
-		reset();
 	}
 </script>
 
 <aside>
-	<GeneralSettingsComponent {reset} />
+	<GeneralSettingsComponent />
 	{#each $figuresData as figure, i}
 		{#if figure.figureType == FigureType.Circle}
 			<CircleComponent {i} {figure} {remove_figure}  />
 		{/if}
-		{#if figure.figureType == FigureType.Square}
+		{#if figure.figureType == FigureType.NGon}
 			<NgonComponent {i} {figure}  {remove_figure}  />
 		{/if}
 	{/each}

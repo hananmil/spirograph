@@ -7,15 +7,15 @@
 	import Card from '@smui/card';
 	import type { NgonDTO } from '$lib';
 	export let i: number;
-	export let figure: any;
+	export let figure: NgonDTO;
 	export let remove_figure: (i: number) => void;
 </script>
 
 <Card>
 	<Content>
 		<h3>NGon</h3>
-		<SpeedControl label="Size" bind:value={figure.numSides} min={2} max={20} step={1} resetTo={4} />
-		<SpeedControl label="Size" bind:value={figure.radius} min={0.1} max={10} step={0.1} resetTo={1}/>
+		<SpeedControl label="Corners" bind:value={figure.numCorners} min={2} max={20} step={1} resetTo={4} />
+		<SpeedControl label="Size" bind:value={figure.size} min={0.1} max={10} step={0.1} resetTo={1}/>
 		<SpeedControl label="Point speed" bind:value={figure.pointSpeed}  />
 		<Vector3DControl
 			label="Rotation"

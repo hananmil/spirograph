@@ -11,9 +11,7 @@ import {
 
 export enum FigureType {
 	Circle,
-	Square,
-	Lline,
-	Triangle
+	NGon,
 }
 export interface DTOVector {
 	x: number;
@@ -39,7 +37,7 @@ export interface DTO extends Record<string | symbol, unknown> {
 export interface CircleDTO extends DTO {}
 
 export interface NgonDTO extends DTO {
-	numSides: number;
+	numCorners: number;
 }
 
 export class ReadableDto<DTO extends Record<string | symbol, unknown>> implements Readable<DTO> {
