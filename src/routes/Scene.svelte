@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { FigureType, ReadableDto, cameraFOV, figuresData, type DTO } from '$lib';
+	import { FigureType, ReadableDto, cameraFOV, figuresData, type DTO, stateStore } from '$lib';
 	import { T, type CurrentWritable, type ThrelteContext } from '@threlte/core';
 	import { useRender } from '@threlte/core';
 	import { onMount } from 'svelte';
@@ -14,7 +14,7 @@
 	makeDefault
 	fov={$cameraFOV}
 	aspect={window.innerWidth / window.innerHeight}
-	near={0.1}
+	near={0.01}
 	far={1000}
 	position={[3, 4, 15]}
 	on:create={({ ref }) => {
@@ -28,7 +28,7 @@
 <T.DirectionalLight position={[10, 10, 10]} intensity={0.5}/>
 <T.HemisphereLight position={[1, 1, 1]} intensity={0.6} />
 
-<Sky elevation={0.3} />
+<Sky elevation={$stateStore.time/20} />
 
 <Axis axis={0} color={0xffffff00} />
 <Axis axis={1} color={0xff00ff00} />
