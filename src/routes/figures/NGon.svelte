@@ -1,22 +1,28 @@
 <script lang="ts">
-  	import { stateStore, type NgonDTO, type ReadableDto } from '$lib';
+  	import { stateStore, type NgonDTO } from '$lib';
 	import { T } from '@threlte/core';
 	import { onDestroy, onMount } from 'svelte';
+	import type { Writable } from 'svelte/store';
 	import { CatmullRomCurve3, TubeGeometry, Vector3, type Vector3Tuple } from 'three';
 
-    export let dto: ReadableDto<NgonDTO>;
-    let corners = cornersPosition($dto.numCorners,$dto.size);
+    export let dto: NgonDTO;
+    let corners = cornersPosition(dto.numCorners,dto.size);
     
     let path = new CatmullRomCurve3(corners, true, 'catmullrom', 0.01);
     
 
-    let geometry:TubeGeometry = new TubeGeometry(path, 20*$dto.numCorners, 0.01*$dto.size, 12, true); 
-    let objectRotation: Vector3Tuple = getRotation($dto,$stateStore.time);
-    let pointPosition: Vector3Tuple = getLocalPoint($stateStore.time,$dto.numCorners,$dto.size,$dto.pointSpeed);
+    let geometry:TubeGeometry = new TubeGeometry(path, 20*dto.numCorners, 0.01*dto.size, 12, true); 
+    let objectRotation: Vector3Tuple = getRotation(dto,$stateStore.time);
+    export let pointPosition:Writable<Vector3Tuple>;
+	export let position: Vector3Tuple = [0, 0, 0];
+
+	onMount(() => {
+		$pointPosition = getLocalPoint($stateStore.time,dto.numCorners,dto.size,dto.pointSpeed);
+	});
  
     const stateStoreUnsub = stateStore.subscribe((value) => {
-        pointPosition = getLocalPoint(value.time,$dto.numCorners,$dto.size,$dto.pointSpeed);
-        objectRotation = getRotation($dto,value.time);
+        $pointPosition = getLocalPoint(value.time,dto.numCorners,dto.size,dto.pointSpeed);
+        objectRotation = getRotation(dto,value.time);
 
     });
 
@@ -24,7 +30,7 @@
         corners = cornersPosition(value.numCorners,value.size);
 		path = new CatmullRomCurve3(corners, true, 'catmullrom', 0.01);
 		geometry = new TubeGeometry(path, 20 * value.numCorners, 0.01*value.size, 12, true);
-        pointPosition = getLocalPoint($stateStore.time,value.numCorners,value.size,value.pointSpeed);
+        $pointPosition = getLocalPoint($stateStore.time,value.numCorners,value.size,value.pointSpeed);
         objectRotation = getRotation(value,$stateStore.time);
     });
 
@@ -36,7 +42,7 @@
 
 	function cornersPosition(numCorners:number,size:number): Vector3[] {
 		const points: Vector3[] = [];
-		for (let i = 0; i < $dto.numCorners; i++) {
+		for (let i = 0; i < dto.numCorners; i++) {
 			const angle = (2 * Math.PI * i) / numCorners;
 			const x = size * Math.cos(angle);
 			const y = size * Math.sin(angle);
@@ -86,12 +92,12 @@
     }
 </script>
 
-<T.Object3D rotation={objectRotation}>
+<T.Object3D rotation={objectRotation} position={position}>
 	<T.Mesh args={[geometry]}>
 		<T.MeshStandardMaterial color="white" />
 	</T.Mesh>
-	<T.Mesh position={pointPosition}>
-		<T.SphereGeometry args={[$dto.size * 0.02]} />
+	<T.Mesh position={$pointPosition}>
+		<T.SphereGeometry args={[dto.size * 0.02]} />
 		<T.MeshStandardMaterial color="red" />
 	</T.Mesh>
 </T.Object3D>

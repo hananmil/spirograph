@@ -1,5 +1,5 @@
 import { writable, type Readable, type Writable } from 'svelte/store';
-import type { DTO, ReadableDto } from "$lib";
+import type { DTO } from "$lib";
 import * as THREE from "three";
 import { expoOut } from 'svelte/easing';
 
@@ -36,11 +36,31 @@ function createStateStore(){
     }
 }
 
+function createFigureDataStore(){
+    const writableData = writable<DTO[]>([]);
+    const readableData:Readable<DTO[]> = writableData;
+    const {subscribe,update,set} = writableData;
+    return {
+        readableData: readableData,
+        resetData: () => set([]),
+        addData: (newData:DTO) => update(data => {
+            console.log("adding data",data,newData);
+            return [...data,newData];
+        }),
+        remoevAtIndex: (index:number) => update(d => {
+            d.splice(index,1);
+            return d;
+        }),
+        subscribe
+    }
+}
+
+export const figuresData = createFigureDataStore();
+
 export const rotateCamera:Writable<boolean> = writable(true);
 export const cameraFOV:Writable<number> = writable(50);
 export const showFigures:Writable<boolean> = writable(true);
 export const showDots:Writable<boolean> = writable(true);
 export const isPaused:Writable<boolean> = writable(false);
 export const stateStore = createStateStore();
-export const figuresData: Writable<ReadableDto<DTO>[]> = writable([]);
-export const stepsPerSecond: Writable<number> = writable(1);
+export const stepsPerSecond: Writable<number> = writable(20);

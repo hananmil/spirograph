@@ -5,10 +5,9 @@
 	import SpeedControl from './components/speedControl.svelte';
 	import Vector3DControl from './components/vector3DControl.svelte';
 	import Card from '@smui/card';
-	import type { NgonDTO } from '$lib';
+	import { figuresData, type NgonDTO } from '$lib';
 	export let i: number;
 	export let figure: NgonDTO;
-	export let remove_figure: (i: number) => void;
 </script>
 
 <Card>
@@ -25,7 +24,7 @@
 		/>
 
 		<FormField align="end" style="display: flex;">
-			<Button on:click={() => remove_figure(i)}>
+			<Button on:click={() => figuresData.remoevAtIndex(i)}>
 				<ButtonIcon class="material-icons">remove_circle</ButtonIcon>
 				<ButtonLabel>Remove Square</ButtonLabel>
 			</Button>

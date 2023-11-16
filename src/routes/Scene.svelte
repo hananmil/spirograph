@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { FigureType, cameraFOV, figuresData, stateStore } from '$lib';
+	import { cameraFOV, figuresData, stateStore } from '$lib';
 	import { T } from '@threlte/core';
 	import Axis from './Axis.svelte';
 	import { Grid, OrbitControls, Sky } from '@threlte/extras';
-	import Circle from './figures/Circle.svelte';
-	import NGon from './figures/NGon.svelte';
+	import { get } from 'svelte/store';
+	import Figure from './figures/Figure.svelte';
 </script>
 
 <T.PerspectiveCamera
@@ -41,14 +41,4 @@
 	fadeOut={false}
 	position={[0, -8, 0]}
 />
-
-{#each $figuresData as figureData}
-	{@const type = figureData.dtoWrapper.figureType}
-	{#if type === FigureType.Circle}
-		<Circle dto={figureData} />
-	{/if}
-
-	{#if type === FigureType.NGon}
-		<NGon dto={figureData}/>
-	{/if}
-{/each}
+<Figure data={$figuresData} />

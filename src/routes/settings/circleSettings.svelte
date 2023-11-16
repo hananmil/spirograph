@@ -1,15 +1,13 @@
 <script lang="ts">
 	import FormField from '@smui/form-field';
 	import Card, { Content } from '@smui/card';
-	import Slider from '@smui/slider';
 	import Button, { Icon as ButtonIcon, Label as ButtonLabel } from '@smui/button';
-	import { figuresData } from '$lib';
+	import {  figuresData, type CircleDTO } from '$lib';
 	import SpeedControl from './components/speedControl.svelte';
 	import Vector3DControl from './components/vector3DControl.svelte';
 
 	export let i: number;
-	export let figure: any;
-	export let remove_figure: (i: number) => void;
+	export let figure: CircleDTO;
 </script>
 
 <Card>
@@ -33,7 +31,7 @@
 		/>
 
 		<FormField align="end" style="display: flex;">
-			<Button on:click={() => remove_figure(i)}>
+			<Button on:click={() => figuresData.remoevAtIndex(i)}>
 				<ButtonIcon class="material-icons">remove_circle</ButtonIcon>
 				<ButtonLabel>Remove Circle</ButtonLabel>
 			</Button>

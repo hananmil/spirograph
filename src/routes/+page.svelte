@@ -1,9 +1,7 @@
 <script lang="ts">
-	import Paper, { Title, Subtitle, Content as PaperContent } from '@smui/paper';
-	import { type Figure, FiguresFactory } from '$lib';
 	import { onMount } from 'svelte';
 	import { Canvas } from '@threlte/core'
-	import SideBar from './sideBar.svelte';
+	import SideBar from './SideBar.svelte';
 	import { stateStore, isPaused, stepsPerSecond } from '$lib/state';
 	import Scene from './Scene.svelte';
 
@@ -34,17 +32,10 @@
 </script>
 
 <div class="drawer-container app-content">
-	<Paper>
-		<PaperContent>
-			<SideBar />
-		</PaperContent>
-	</Paper>
-
-	<main>
-		<Canvas>
-			<Scene/>
-		</Canvas>
-	</main>
+	<Canvas>
+		<Scene/>
+	</Canvas>
+	<SideBar />
 </div>
 
 <style lang="less">

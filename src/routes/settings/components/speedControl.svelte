@@ -3,9 +3,7 @@
 	import Slider from '@smui/slider';
 	import Textfield, { Input } from '@smui/textfield';
 
-	import type * as THREE from 'three';
 	import ButtonIcon from '@smui/icon-button';
-	import Button from '@smui/button';
 	export let min: number = -2;
 	export let max: number = 2;
 	export let step: number = 0.0025;
@@ -30,6 +28,7 @@
 		class="solo-input"
 		type="number"
 		/>
+	<small>{unit}</small>
 	<Slider style="flex-grow: 1;" bind:this={speedSlider} bind:value={value} {min} {max} {step} />
 	<ButtonIcon
 		class="material-icons"
